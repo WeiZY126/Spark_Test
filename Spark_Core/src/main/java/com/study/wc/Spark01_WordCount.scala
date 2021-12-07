@@ -13,7 +13,7 @@ object Spark01_WordCount {
     val sc = new SparkContext(sparkConf)
     //TODO 执行业务操作
     //1.读取文件，获取一行一行数据
-    val lines: RDD[String] = sc.textFile("datas")
+    val lines: RDD[String] = sc.textFile("datas/*")
 
     //2.将一行数据拆分，形成一个一个单词（分词）
     //扁平化：整体拆分成个体
@@ -26,14 +26,15 @@ object Spark01_WordCount {
 
     //4.对分组后的数据进行转换
     //(hello,3),(world,2)
-    val wordToCount = value.map {
+    val wordToCount: RDD[(String, Int)] = value.map {
       case (word, list) => {
         (word, list.size)
       }
     }
 
     //5.将转换结果采集到控制台
-    println(wordToCount)
+    val array: Array[(String, Int)] = wordToCount.collect()
+    array.foreach(println)
     //TODO 关闭链接
     sc.stop()
   }
