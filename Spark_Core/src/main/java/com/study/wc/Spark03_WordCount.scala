@@ -8,6 +8,7 @@ object Spark03_WordCount {
     //Application
     //Spark框架
     //TODO 建立和spark框架的链接
+
     val sparkConf = new SparkConf().setMaster("local").setAppName("WordCount")
     val sc = new SparkContext(sparkConf)
     //TODO 执行业务操作
