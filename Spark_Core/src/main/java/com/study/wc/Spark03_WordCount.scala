@@ -5,7 +5,7 @@ import org.apache.spark.rdd.RDD
 
 object Spark03_WordCount {
   def main(args: Array[String]): Unit = {
-    //spark框架提供更多功能，可以将分组和聚合使用一个方法实现
+    //Application
     //Spark框架
     //TODO 建立和spark框架的链接
     val sparkConf = new SparkConf().setMaster("local").setAppName("WordCount")
@@ -16,9 +16,14 @@ object Spark03_WordCount {
     val words: RDD[String] = lines.flatMap(_.split(" "))
 
     val wordToOne: RDD[(String, Int)] = words.map(word => (word, 1))
+    //reduceByKey:相同key的数据，可以对value进行reduce聚合
+    val wordToCount: RDD[(String, Int)] = wordToOne.reduceByKey(_ + _)
 
-    //reduceByKey:相同的key可以对value进行reduce聚合
-    wordToOne.reduceByKey(_+_)
+
+    val array: Array[(String, Int)] = wordToCount.collect()
+    array.foreach(println)
+    //TODO 关闭链接
+    sc.stop()
   }
 
 }
