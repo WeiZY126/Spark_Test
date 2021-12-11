@@ -1,4 +1,4 @@
-package com.study.test
+package com.study.core02Test
 
 import java.io.{ObjectOutputStream, OutputStream}
 import java.net.Socket

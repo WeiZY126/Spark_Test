@@ -1,4 +1,4 @@
-package com.study.test
+package com.study.core02Test
 
 case class Task(){
   val datas = List(1, 2, 3, 4)

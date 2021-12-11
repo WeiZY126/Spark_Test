@@ -1,4 +1,4 @@
-package com.study.test
+package com.study.core02Test
 
 case class SubTask(){
   var datas:List[Int]= _

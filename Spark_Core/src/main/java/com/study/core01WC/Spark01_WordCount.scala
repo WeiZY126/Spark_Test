@@ -1,4 +1,4 @@
-package com.study.wc
+package com.study.core01WC
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
