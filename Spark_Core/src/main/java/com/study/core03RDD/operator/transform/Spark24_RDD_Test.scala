@@ -18,8 +18,11 @@ object Spark24_RDD_Test {
       ((strings(1), strings(4)), 1)
     })
     val reduceRDD: RDD[((String, String), Int)] = mapRDD.reduceByKey(_ + _)
-    val groupRDD: RDD[(String, Iterable[(String, Int)])] = reduceRDD.map((tup) => (tup._1._1, (tup._1._2, tup._2))).groupByKey()
-    val value: RDD[(String, List[(String, Int)])] = groupRDD.mapValues(iter => iter.toList.sortBy(_._2).takeRight(3))
+    //    val groupRDD: RDD[(String, Iterable[(String, Int)])] = reduceRDD.map((tup) => (tup._1._1, (tup._1._2, tup._2))).groupByKey()
+    val groupRDD: RDD[(String, Iterable[(String, Int)])] = reduceRDD.map {
+      case ((pre, ad), sum) => (pre, (ad, sum))
+    }.groupByKey()
+    val value: RDD[(String, List[(String, Int)])] = groupRDD.mapValues(iter => iter.toList.sortBy(_._2)(Ordering.Int.reverse).take(3))
     value.collect().foreach(println)
     //TODO 关闭环境
     sc.stop()
