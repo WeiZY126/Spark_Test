@@ -8,7 +8,7 @@ import scala.Console.println
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-object spark02_Test_Acc {
+object spark01_Test {
   def main(args: Array[String]): Unit = {
     val sparkConf: SparkConf = new SparkConf().setMaster("local[3]").setAppName("test1")
     val sc = new SparkContext(sparkConf)
@@ -49,11 +49,18 @@ object spark02_Test_Acc {
     val topList: List[(String, ((Int, Int, Int), ListBuffer[(String, Int)]))] = hotAcc.value.toList.sortBy(_._2._1)(Ordering[(Int, Int, Int)].reverse).take(10)
 
     val topRDD: RDD[(String, ((Int, Int, Int), ListBuffer[(String, Int)]))] = sc.makeRDD(topList)
-    topRDD.mapPartitions(iter=>{
-      val buffer: ListBuffer.type = ListBuffer
-      buffer
-      
-    })
+    topRDD.mapPartitions(iter => {
+      val list: ListBuffer[(String, (String, Int))] = ListBuffer()
+      iter.foreach(tup => {
+        val stringToInt: Map[String, Int] = tup._2._2.groupBy(_._1).map(session => {
+          (session._1, session._2.length)
+        })
+        stringToInt.foreach(tup1 => list.append((tup._1, (tup1._1, tup1._2))))
+      })
+      list.iterator
+    }).groupByKey().map(dates=>{
+      (dates._1,dates._2.toList.sortBy(_._2)(Ordering[Int].reverse).take(10))
+    }).collect().foreach(println)
     sc.stop()
   }
 
