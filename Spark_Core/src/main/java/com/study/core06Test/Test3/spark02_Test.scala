@@ -25,7 +25,21 @@ object spark02_Test {
     }).reduceByKey(_ + _).collect().toMap
     //TODO-计算分子
     val sortRDD: RDD[(String, List[UserVisitAction])] = actionDataRDD.groupBy(_.session_id).mapValues(_.toList.sortBy(_.action_time))
+    /*
+    滑窗实现
+     */
     val slidingRDD: RDD[Iterator[List[UserVisitAction]]] = sortRDD.map(_._2.sliding(2))
+
+    /*
+    拉链实现
+     */
+    val zipRDD: RDD[List[((Long, Long), Int)]] = sortRDD.map(iter => {
+      val sortList: List[UserVisitAction] = iter._2.toList
+      val flowList: List[Long] = sortList.map(_.page_id)
+      val tuples: List[(Long, Long)] = flowList.zip(flowList.tail)
+      tuples.map(zip => ((zip._1, zip._2), 1))
+    })
+
     val jumpRDD: RDD[((Long, Long), Int)] = slidingRDD.flatMap(iter => {
       iter.map(list => if (list.size > 1) ((list(0).page_id, list(1).page_id), 1) else null)
     }).filter(_ != null).reduceByKey(_ + _)
